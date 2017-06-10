@@ -26,17 +26,45 @@ int main(int argc, char* argv[]){
 	listen(socketescucha, 1);
 
 	struct sockaddr_in cliente;
-	while(socketconexion = accept(socketescucha, (struct sockaddr *)&cliente, (socklen_t *)sizeof(cliente))){
+	socklen_t tamanocliente = sizeof(cliente);
+
+	socketconexion = accept(socketescucha, (struct sockaddr *)&cliente, &tamanocliente);
+
+	if(socketconexion < 0){
+		fatale("Fallo en el accept");
+	}
+
+	while(socketconexion){
 		char respuesta[BUFSIZE];
 		char mensaje[BUFSIZE];
        	 	bzero(respuesta, 512);
         	bzero(mensaje, 512);
+		int tamanomensaje;
+		int tamanorespuesta;
 
 		strcpy(mensaje, MSG_220);
-		send(socketconexion, mensaje, BUFSIZE, 0);
-	}
-	if(socketconexion < 0){
-		fatale("Fallo en el accept");
+
+		if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
+			printf("Error en el envio\n");
+		}
+
+		if((tamanorespuesta = recv(socketconexion, respuesta, BUFSIZE, 0)) < 0){
+			printf("Error en la respuesta\n");
+		}
+
+		if(strncmp(respuesta, "USER ", 5) == 0){
+			char * usuario;
+			char * delimitador = "USER ";
+
+			usuario = strtok(respuesta, delimitador);
+
+			sprintf(mensaje, MSG_331, usuario);
+
+			if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
+				printf("Error en el envio\n");
+			}
+
+		}
 	}
 
 	return 0;
