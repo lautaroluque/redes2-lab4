@@ -38,13 +38,9 @@ int main(int argc, char* argv[]){
 			int tamanomensaje;
 			int tamanorespuesta;
 
-			char * temp = malloc(BUFSIZE);
-			char * temp2 = malloc(BUFSIZE);
-			char * usuario;
-			char * contrasena;
+			char * usuario = malloc(BUFSIZE);
+			char * contrasena = malloc(BUFSIZE);
 			char * combo = malloc(BUFSIZE);
-			char * delimitadoruser = "USER ";
-			char * delimitadorpass = "PASS ";
 			FILE * lista;
 			int login = 0;
 
@@ -61,14 +57,10 @@ int main(int argc, char* argv[]){
 			}
 
 			if(strncmp(respuesta, "USER ", 5) == 0){
-				strcpy(temp, respuesta);
-				usuario = strtok(temp, delimitadoruser);
-				int i = 0;
-				char c;
-				size_t largo = strlen(usuario);
-				for(i; i <= largo; i++){
-					c = usuario[i];
-					if(isspace(c) != 0){
+				strcpy(usuario, respuesta);
+				usuario += 5;
+				for(int i = 0; i <= strlen(usuario); i++){
+					if(isspace(usuario[i]) != 0){
 						usuario[i] = '\0';
 						break;
 					}
@@ -88,8 +80,8 @@ int main(int argc, char* argv[]){
 			}
 
 			if(strncmp(respuesta, "PASS ", 5) == 0){
-				strcpy(temp2, respuesta);
-				contrasena = strtok(temp2, delimitadorpass);
+				strcpy(contrasena, respuesta);
+				contrasena += 5;
 			}else{
 				printf("Respuesta invalida: password\n");
 				break;
@@ -114,6 +106,7 @@ int main(int argc, char* argv[]){
 					}
 				}
 			}
+
 			fclose(lista);
 
 			if(login == 1){
@@ -128,7 +121,66 @@ int main(int argc, char* argv[]){
 					printf("Error en la respuesta\n");
 					break;
 				}
-			}else{
+				if(strncmp(respuesta, "RETR ", 5) == 0){
+					char * nombrearchivo = malloc(BUFSIZE);
+					strcpy(nombrearchivo, respuesta);
+					nombrearchivo += 5;
+
+					FILE * archivo;
+					archivo = fopen(nombrearchivo, "r");
+
+					if(archivo){
+						int tamanoarchivo;
+						fseek(archivo, 0, SEEK_END);
+						tamanoarchivo = ftell(archivo);
+						rewind(archivo);
+
+						bzero(respuesta, BUFSIZE);
+						bzero(mensaje, BUFSIZE);
+						sprintf(mensaje, MSG_299, nombrearchivo, tamanoarchivo);
+						if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
+							printf("Error en el envio\n");
+							break;
+						}
+						if((tamanorespuesta = recv(socketconexion, respuesta, BUFSIZE, 0)) < 0){
+							printf("Error en la respuesta\n");
+							break;
+						}
+
+						bzero(mensaje, BUFSIZE);
+						while(fread(mensaje, BUFSIZE, 1, archivo) == BUFSIZE){
+							if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
+								printf("Error en el envio\n");
+								break;
+							}
+						}
+
+						bzero(respuesta, BUFSIZE);
+						bzero(mensaje, BUFSIZE);
+						sprintf(mensaje, MSG_226);
+						if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
+							printf("Error en el envio\n");
+							break;
+						}
+						if((tamanorespuesta = recv(socketconexion, respuesta, BUFSIZE, 0)) < 0){
+							printf("Error en la respuesta\n");
+							break;
+						}
+					}else{
+						bzero(respuesta, BUFSIZE);
+						bzero(mensaje, BUFSIZE);
+						sprintf(mensaje, MSG_550, nombrearchivo);
+						if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
+							printf("Error en el envio\n");
+							break;
+						}
+						if((tamanorespuesta = recv(socketconexion, respuesta, BUFSIZE, 0)) < 0){
+							printf("Error en la respuesta\n");
+							break;
+						}
+					}
+				}
+			}else if(login == 0){
 				bzero(respuesta, BUFSIZE);
 				bzero(mensaje, BUFSIZE);
 				sprintf(mensaje, MSG_530);
@@ -138,6 +190,7 @@ int main(int argc, char* argv[]){
 				}
 				close(socketconexion);
 			}
+
 		}
 	}
 }

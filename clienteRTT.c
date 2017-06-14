@@ -77,16 +77,69 @@ int main(int argc, char* argv[]){
 	}
 
 	if(strncmp(rspst, "230 ", 4) == 0){
-		printf("Operacion:");
-		char * prcn = NULL;
-		size_t lngtd = 0;
-		if(getline(&prcn, &lngtd, stdin) > 0){
-			bzero(mnsj, BUFSIZE);
-			strcpy(mnsj, "PASS ");
-			strcat(mnsj, psswrd);
-			send(sckt, mnsj, BUFSIZE, 0);
-		}
+		while(sckt){
+			printf("Operacion:");
+			char * prcn = NULL;
+			char * nmbrrchv = NULL;
+			size_t lngtd = 0;
+			if(getline(&prcn, &lngtd, stdin) > 0){
+				if(strncmp(prcn, "get ",4) == 0){
+					if((strlen(prcn)) < 5){
+						printf("Nombre de archivo invalido");
+						break;
+					}else{
+						strcpy(nmbrrchv, prcn);
+						nmbrrchv += 4;
+					}
+					bzero(mnsj, BUFSIZE);
+					strcpy(mnsj, "RETR ");
+					strcat(mnsj, nmbrrchv);
+					send(sckt, mnsj, BUFSIZE, 0);
+				}
+			}
 
+			bzero(rspst, BUFSIZE);
+			if((tmrspst = recv(sckt, rspst, BUFSIZE, 0)) < 0){
+				printf("Error en la recepcion\n");
+			}
+
+			if(strncmp(rspst, "299 ", 4) == 0){
+				printf("%s\n", rspst);
+				char * strtmnrchv;
+				int tmnrchv;
+				strcpy(strtmnrchv, rspst);
+				strtmnrchv += 9 + (strlen(nmbrrchv)) + 6;
+				for(int i = 0; i <= strlen(strtmnrchv); i++){
+					if(isspace(strtmnrchv[i]) != 0){
+						strtmnrchv[i] = '\0';
+						break;
+					}
+				}
+				tmnrchv = atoi(strtmnrchv);
+
+				FILE * rchv;
+				rchv = fopen(nmbrrchv, "w");
+
+				int trfr = tmnrchv;
+
+				bzero(rspst, BUFSIZE);
+				while(((tmrspst = recv(sckt, rspst, BUFSIZE, 0)) > 0) && (trfr > 0)){
+					fwrite(rspst, sizeof(char), tmrspst, rchv);
+					trfr -= tmrspst;
+				}
+
+				bzero(rspst, BUFSIZE);
+				if((tmrspst = recv(sckt, rspst, BUFSIZE, 0)) < 0){
+					printf("Error en la recepcion\n");
+				}
+				printf("%s\n", rspst);
+				break;
+			}else if(strncmp(rspst, "550 ", 4) == 0){
+				printf("%s\n", rspst);
+				break;
+			}
+
+		}
 	}
 
 	return 0;
