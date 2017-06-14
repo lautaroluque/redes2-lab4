@@ -26,7 +26,7 @@ int main(int argc, char* argv[]){
 
 	printf("Conexion correcta\n");
 
-	bzero(rspst, 512);
+	bzero(rspst, BUFSIZE);
 	if((tmrspst = recv(sckt, rspst, BUFSIZE, 0)) < 0){
 		printf("Error en la recepcion\n");
 	}
@@ -38,14 +38,14 @@ int main(int argc, char* argv[]){
 		char * usr = NULL;
 		size_t lngtd = 0;
 		if(getline(&usr, &lngtd, stdin) > 0){
-			bzero(mnsj, 512);
+			bzero(mnsj, BUFSIZE);
 			strcpy(mnsj, "USER ");
 			strcat(mnsj, usr);
 			send(sckt, mnsj, BUFSIZE, 0);
 		}
 	}
 
-	bzero(rspst, 512);
+	bzero(rspst, BUFSIZE);
 	if((tmrspst = recv(sckt, rspst, BUFSIZE, 0)) < 0){
 		printf("Error en la recepcion\n");
 	}
@@ -57,19 +57,37 @@ int main(int argc, char* argv[]){
 		char * psswrd = NULL;
 		size_t lngtd = 0;
 		if(getline(&psswrd, &lngtd, stdin) > 0){
-			bzero(mnsj, 512);
+			bzero(mnsj, BUFSIZE);
 			strcpy(mnsj, "PASS ");
 			strcat(mnsj, psswrd);
 			send(sckt, mnsj, BUFSIZE, 0);
 		}
 	}
 
-	bzero(rspst, 512);
+	bzero(rspst, BUFSIZE);
 	if((tmrspst = recv(sckt, rspst, BUFSIZE, 0)) < 0){
 		printf("Error en la recepcion\n");
 	}
 
 	printf("%s\n", rspst);
+
+	if(strncmp(rspst, "530 ", 4) == 0){
+		close(sckt);
+		return 0;
+	}
+
+	if(strncmp(rspst, "230 ", 4) == 0){
+		printf("Operacion:");
+		char * prcn = NULL;
+		size_t lngtd = 0;
+		if(getline(&prcn, &lngtd, stdin) > 0){
+			bzero(mnsj, BUFSIZE);
+			strcpy(mnsj, "PASS ");
+			strcat(mnsj, psswrd);
+			send(sckt, mnsj, BUFSIZE, 0);
+		}
+
+	}
 
 	return 0;
 }
