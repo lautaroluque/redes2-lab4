@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
         {
             char respuesta[BUFSIZE];
             char mensaje[BUFSIZE];
+            char buffer[BUFSIZE];
             int tamanomensaje;
             int tamanorespuesta;
 
@@ -184,16 +185,19 @@ int main(int argc, char* argv[])
                             break;
                         }
 
-                        int transfer = 0;
-                        bzero(mensaje, BUFSIZE);
-                        /*while(fread(mensaje, BUFSIZE, 1, archivo) == BUFSIZE)
+                        bzero(buffer, BUFSIZE);
+                        int tamanoleido = 0;
+                        int tamanoenviar = tamanoarchivo;
+                        while(tamanoenviar > 0)
                         {
-                            if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0)
+			    tamanoleido = fread(buffer, 1, BUFSIZE, archivo);
+                            if((tamanomensaje = send(socketconexion, buffer, tamanoleido, 0)) < 0)
                             {
                                 printf("Error en el envio archivo\n");
                                 break;
                             }
-                        }*/
+                            tamanoenviar -= tamanoleido;
+                        }
 
                         bzero(mensaje, BUFSIZE);
                         sprintf(mensaje, MSG_226);

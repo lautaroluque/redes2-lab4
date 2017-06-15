@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
 
     char rspst[BUFSIZE];
     char mnsj[BUFSIZE];
+    char bffr[BUFSIZE];
     int tmrspst;
 
     printf("Conexion correcta\n");
@@ -135,39 +136,24 @@ int main(int argc, char* argv[])
             if(strncmp(rspst, "299 ", 4) == 0)
             {
                 printf("%s\n", rspst);
-                //char * strtmnrchv = malloc(strlen(rspst)+1);
                 int tmnrchv = 0;
-                //strcpy(strtmnrchv, rspst);
-                //strtmnrchv += 9;
-                //strtmnrchv += (strlen(nmbrrchv));
-                //strtmnrchv += 5;
-                //printf("%s", strtmnrchv);
-                //for(int i = 0; i <= strlen(strtmnrchv); i++){
-                //	if(isspace(strtmnrchv[i]) != 0){
-                //		strtmnrchv[i] = '\0';
-                //		break;
-                //	}
-                //}
-                //printf("%s", strtmnrchv);
 
-                if((tmrspst = recv(sckt, &tmnrchv, sizeof(int), 0)) < 0)
+                if((tmrspst = recv(sckt, &tmnrchv, sizeof(char), 0)) < 0)
                 {
                     printf("Error en la recepcion\n");
                 }
-
-                //tmnrchv = atoi(strtmnrchv);
 
                 FILE * rchv;
                 rchv = fopen(nmbrrchv, "w");
 
                 int trfr = tmnrchv;
 
-                bzero(rspst, BUFSIZE);
-                while(((tmrspst = recv(sckt, rspst, BUFSIZE, 0)) > 0) && (trfr > 0))
+                bzero(bffr, BUFSIZE);
+                while(trfr >= 0)
                 {
-                    fwrite(rspst, sizeof(char), tmrspst, rchv);
+                    tmrspst = recv(sckt, bffr, BUFSIZE, 0);
+                    fwrite(bffr, 1, tmrspst, rchv);
                     trfr -= tmrspst;
-                    printf("Recibiendo archivo");
                 }
 
                 bzero(rspst, BUFSIZE);
