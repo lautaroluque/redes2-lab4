@@ -106,20 +106,26 @@ int main(int argc, char* argv[]){
 
 			if(strncmp(rspst, "299 ", 4) == 0){
 				printf("%s\n", rspst);
-				char * strtmnrchv = malloc(BUFSIZE);
+				//char * strtmnrchv = malloc(strlen(rspst)+1);
 				int tmnrchv = 0;
-				strcpy(strtmnrchv, rspst);
-				strtmnrchv += 9;
-				strtmnrchv += (strlen(nmbrrchv));
-				strtmnrchv += 5;
-				for(int i = 0; i <= strlen(strtmnrchv); i++){
-					if(isspace(strtmnrchv[i]) != 0){
-						strtmnrchv[i] = '\0';
-						//break;
-					}
+				//strcpy(strtmnrchv, rspst);
+				//strtmnrchv += 9;
+				//strtmnrchv += (strlen(nmbrrchv));
+				//strtmnrchv += 5;
+				//printf("%s", strtmnrchv);
+				//for(int i = 0; i <= strlen(strtmnrchv); i++){
+				//	if(isspace(strtmnrchv[i]) != 0){
+				//		strtmnrchv[i] = '\0';
+				//		break;
+				//	}
+				//}
+				//printf("%s", strtmnrchv);
+
+				if((tmrspst = recv(sckt, &tmnrchv, sizeof(int), 0)) < 0){
+					printf("Error en la recepcion\n");
 				}
-				printf("%s", strtmnrchv);
-				tmnrchv = atoi(strtmnrchv);
+
+				//tmnrchv = atoi(strtmnrchv);
 
 				FILE * rchv;
 				rchv = fopen(nmbrrchv, "w");

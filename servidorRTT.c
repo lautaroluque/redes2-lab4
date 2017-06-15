@@ -145,43 +145,34 @@ int main(int argc, char* argv[]){
 						bzero(mensaje, BUFSIZE);
 						sprintf(mensaje, MSG_299, nombrearchivo, tamanoarchivo);
 						if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
-							printf("Error en el envio\n");
+							printf("Error en el envio 299\n");
 							break;
 						}
-						if((tamanorespuesta = recv(socketconexion, respuesta, BUFSIZE, 0)) < 0){
-							printf("Error en la respuesta\n");
+
+						if((tamanomensaje = send(socketconexion, &tamanoarchivo, sizeof(int), 0)) < 0){
+							printf("Error en el envio filesize\n");
 							break;
 						}
 
 						bzero(mensaje, BUFSIZE);
 						while(fread(mensaje, BUFSIZE, 1, archivo) == BUFSIZE){
 							if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
-								printf("Error en el envio\n");
+								printf("Error en el envio archivo\n");
 								break;
 							}
 						}
 
-						bzero(respuesta, BUFSIZE);
 						bzero(mensaje, BUFSIZE);
 						sprintf(mensaje, MSG_226);
 						if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
-							printf("Error en el envio\n");
-							break;
-						}
-						if((tamanorespuesta = recv(socketconexion, respuesta, BUFSIZE, 0)) < 0){
-							printf("Error en la respuesta\n");
+							printf("Error en el envio 226\n");
 							break;
 						}
 					}else{
-						bzero(respuesta, BUFSIZE);
 						bzero(mensaje, BUFSIZE);
 						sprintf(mensaje, MSG_550, nombrearchivo);
 						if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0){
 							printf("Error en el envio\n");
-							break;
-						}
-						if((tamanorespuesta = recv(socketconexion, respuesta, BUFSIZE, 0)) < 0){
-							printf("Error en la respuesta\n");
 							break;
 						}
 					}
