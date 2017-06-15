@@ -88,6 +88,7 @@ int main(int argc, char* argv[]){
 						printf("Nombre de archivo invalido");
 						break;
 					}else{
+						nmbrrchv = malloc(strlen(prcn)+1);
 						strcpy(nmbrrchv, prcn);
 						nmbrrchv += 4;
 					}
@@ -105,16 +106,19 @@ int main(int argc, char* argv[]){
 
 			if(strncmp(rspst, "299 ", 4) == 0){
 				printf("%s\n", rspst);
-				char * strtmnrchv;
-				int tmnrchv;
+				char * strtmnrchv = malloc(BUFSIZE);
+				int tmnrchv = 0;
 				strcpy(strtmnrchv, rspst);
-				strtmnrchv += 9 + (strlen(nmbrrchv)) + 6;
+				strtmnrchv += 9;
+				strtmnrchv += (strlen(nmbrrchv));
+				strtmnrchv += 5;
 				for(int i = 0; i <= strlen(strtmnrchv); i++){
 					if(isspace(strtmnrchv[i]) != 0){
 						strtmnrchv[i] = '\0';
-						break;
+						//break;
 					}
 				}
+				printf("%s", strtmnrchv);
 				tmnrchv = atoi(strtmnrchv);
 
 				FILE * rchv;

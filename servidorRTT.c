@@ -122,9 +122,15 @@ int main(int argc, char* argv[]){
 					break;
 				}
 				if(strncmp(respuesta, "RETR ", 5) == 0){
-					char * nombrearchivo = malloc(BUFSIZE);
+					char * nombrearchivo = malloc(strlen(respuesta)+1);
 					strcpy(nombrearchivo, respuesta);
 					nombrearchivo += 5;
+					for(int i = 0; i <= strlen(nombrearchivo); i++){
+						if(isspace(nombrearchivo[i]) != 0){
+							nombrearchivo[i] = '\0';
+							break;
+						}
+					}
 
 					FILE * archivo;
 					archivo = fopen(nombrearchivo, "r");
