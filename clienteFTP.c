@@ -109,10 +109,12 @@ int main(int argc, char* argv[])
             if(getdelim(&prcn, &lngtd, '\n', stdin) != -1)
             {
                 prcn[strcspn(prcn, "\r")] = 0;
-                if((strncmp(prcn, "GET ",4) != 0) && (strncmp(prcn, "get ",4) != 0))
+                if((strncmp(prcn, "QUIT",4) == 0) || (strncmp(prcn, "quit",4) == 0))
                 {
-                    printf("Operación inválida\n");
-                    continue;
+                    bzero(mnsj, BUFSIZE);
+                    strcpy(mnsj, "QUIT");
+                    send(sckt, mnsj, BUFSIZE, 0);
+                    break;
                 }
                 else if((strncmp(prcn, "GET ",4) == 0) || (strncmp(prcn, "get ",4) == 0))
                 {
@@ -139,6 +141,11 @@ int main(int argc, char* argv[])
                         strcat(mnsj, nmbrrchv);
                         send(sckt, mnsj, BUFSIZE, 0);
                     }
+                }
+                else
+                {
+                    printf("Operación inválida\n");
+                    continue;
                 }
             }
             else

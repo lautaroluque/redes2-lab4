@@ -216,6 +216,19 @@ int main(int argc, char* argv[])
                     }
                 }
             }
+            else if(strncmp(respuesta, "QUIT", 4) == 0)
+            {
+                    bzero(respuesta, BUFSIZE);
+                    bzero(mensaje, BUFSIZE);
+                    sprintf(mensaje, MSG_221);
+                    if((tamanomensaje = send(socketconexion, mensaje, BUFSIZE, 0)) < 0)
+                    {
+                        printf("Error enviando saludo final\n");
+                        break;
+                    }
+		close(socketconexion);
+                break;
+            }
             else
             {
                 printf("Comando inválido: %s\n", respuesta);
